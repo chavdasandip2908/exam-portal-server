@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 
 function AttemptTestPage() {
@@ -18,8 +19,17 @@ function AttemptTestPage() {
 
   const startTest = async () => {
     // Here we'll add the API call to validate test creator and code
-    console.log({ testCreator, testCode });
-    setTestStarted(true);
+
+    try {
+      const response = await axios.get(`http://localhost:5000/api/test/${testCode}`);
+      setTestStarted(true);
+      console.log(response.data.code);
+    } catch (error) {
+      console.error('Error creating test:', error);
+    }
+
+    // console.log({ testCreator, testCode });
+    // setTestStarted(true);
   };
 
   const handleAnswer = (answer) => {
@@ -51,21 +61,21 @@ function AttemptTestPage() {
     return (
       <div className="attempt-test-page">
         <h1>Attempt Test</h1>
-        <input 
-          type="text" 
-          value={testCreator} 
-          onChange={(e) => setTestCreator(e.target.value)} 
-          placeholder="Test Creator" 
-          required 
+        <input
+          type="text"
+          value={testCreator}
+          onChange={(e) => setTestCreator(e.target.value)}
+          placeholder="Test Creator"
+          required
         />
-        <input 
-          type="text" 
-          value={testCode} 
-          onChange={(e) => setTestCode(e.target.value)} 
-          placeholder="Test Code" 
-          required 
+        <input
+          type="text"
+          value={testCode}
+          onChange={(e) => setTestCode(e.target.value)}
+          placeholder="Test Code"
+          required
         />
-        <button onClick={startTest}>Start Test</button>
+        <button className='button' onClick={startTest}>Start Test</button>
       </div>
     );
   }
@@ -87,7 +97,7 @@ function AttemptTestPage() {
       <h2>Question {currentQuestion + 1}</h2>
       <p>{currentQ.question}</p>
       {currentQ.options.map((option, index) => (
-        <button key={index} onClick={() => handleAnswer(option)}>
+        <button className='button' key={index} onClick={() => handleAnswer(option)}>
           {option}
         </button>
       ))}
@@ -96,9 +106,9 @@ function AttemptTestPage() {
         <button onClick={() => handleNext()}>Skip</button>
         <button onClick={handleReviewLater}>Mark for Review</button>
         {currentQuestion < testQuestions.length - 1 ? (
-          <button onClick={handleNext}>Next</button>
+          <button className='button' onClick={handleNext}>Next</button>
         ) : (
-          <button onClick={() => setTestCompleted(true)}>Submit</button>
+          <button className='button' onClick={() => setTestCompleted(true)}>Submit</button>
         )}
       </div>
     </div>

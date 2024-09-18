@@ -31,7 +31,7 @@ function CreateTestPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/tests/create', {
+      const response = await axios.post('http://localhost:5000/api/test/create', {
         name: testName,
         creator: 'User', // In a real app, this would be the logged-in user
         questions: questions
