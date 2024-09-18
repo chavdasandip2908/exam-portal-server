@@ -9,13 +9,14 @@ function AttemptTestPage() {
   const [reviewLater, setReviewLater] = useState([]);
   const [testStarted, setTestStarted] = useState(false);
   const [testCompleted, setTestCompleted] = useState(false);
+  const [testQuestions, setTestQuestions] = useState([]);
 
   // Dummy test data (replace with actual API call)
-  const testQuestions = [
-    { id: 1, question: "What is 2 + 2?", options: ["3", "4", "5", "6"] },
-    { id: 2, question: "What is the capital of France?", options: ["London", "Berlin", "Paris", "Madrid"] },
-    // Add more questions...
-  ];
+  // const testQuestions = [
+  //   { id: 1, question: "What is 2 + 2?", options: ["3", "4", "5", "6"] },
+  //   { id: 2, question: "What is the capital of France?", options: ["London", "Berlin", "Paris", "Madrid"] },
+  //   // Add more questions...
+  // ];
 
   const startTest = async () => {
     // Here we'll add the API call to validate test creator and code
@@ -23,7 +24,10 @@ function AttemptTestPage() {
     try {
       const response = await axios.get(`http://localhost:5000/api/test/${testCode}`);
       setTestStarted(true);
-      console.log(response.data.code);
+      console.log(response.data.test);
+
+      setTestQuestions(response.data.test.questions)
+
     } catch (error) {
       console.error('Error creating test:', error);
     }

@@ -8,8 +8,10 @@ router.post('/create', async (req, res) => {
     const { name, creator, questions } = req.body;
     const newTest = new Test({ name, creator, questions });
     const savedTest = await newTest.save();
+    
     // Send the ID of the newly created test
     res.status(201).json({ message: 'Test created successfully', code: savedTest._id });
+
   } catch (error) {
     res.status(500).json({ message: 'Error creating test', error });
   }
@@ -20,13 +22,15 @@ router.post('/create', async (req, res) => {
 router.get('/:code', async (req, res) => {
   try {
     const { code } = req.params;
-    console.log(code);
-    
+
     if (!code) {
       return res.status(400).json({ message: 'Code parameter is required' });
     }
 
-    const test = await Test.findOne({ code }).select('-__v'); // Excludes the version key
+    const test = await Test.findOne({
+      _id: code
+    }).select('-__v'); // Excludes the version key
+
     if (!test) {
       return res.status(404).json({ message: 'Test not found' });
     }
