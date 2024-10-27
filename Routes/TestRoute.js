@@ -1,6 +1,35 @@
 const express = require('express');
+const OpenAI = require('openai');
 const router = express.Router();
+require('dotenv').config();
+
 const Test = require('../model/TestModel');
+
+console.log("key ::  ", process.env.OPENAI_API_KEY);
+// Initialize OpenAI API
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+router.post('/generate-test', async (req, res) => {
+  const { topic, numQuestions } = req.body;
+
+  try {
+      const prompt = `Generate ${numQuestions} multiple-choice questions on the topic: ${topic}`;
+      const response = await openai.completions.create({
+          model: "text-davinci-003",
+          prompt: prompt,
+          max_tokens: 1500,
+      });
+
+      const questions = response.choices[0].text.trim().split('\n');
+      res.json({ questions });
+  } catch (error) {
+      console.error("Error generating test:", error);
+      res.status(500).json({ error: 'Error generating questions' });
+  }
+});
+
 
 // Create a new test
 router.post('/create', async (req, res) => {
@@ -107,6 +136,8 @@ router.post('/submit/:code', async (req, res) => {
     res.status(500).json({ message: 'Error submitting test', error });
   }
 });
+
+
 
 
 
