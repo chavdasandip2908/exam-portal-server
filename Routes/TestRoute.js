@@ -15,16 +15,16 @@ router.post('/ai', async (req, res) => {
 
   try {
     const prompt = `Generate ${numQuestions} multiple-choice questions on the topic: ${topic}`;
-    const response = await openai.completions.create({
-      model: "text-davinci-003",
-      prompt: prompt,
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
       max_tokens: 1500,
     });
 
-    const questions = response.choices[0].text.trim().split('\n');
+    const questions = response.choices[0].message.content.trim().split('\n');
     res.json({ questions });
   } catch (error) {
-    console.error("Error generating test :: ", error);
+    console.error("Error generating test:", error);
     res.status(500).json({ error: 'Error generating questions' });
   }
 });
