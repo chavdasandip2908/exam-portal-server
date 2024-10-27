@@ -15,18 +15,18 @@ router.post('/generate-test', async (req, res) => {
   const { topic, numQuestions } = req.body;
 
   try {
-      const prompt = `Generate ${numQuestions} multiple-choice questions on the topic: ${topic}`;
-      const response = await openai.completions.create({
-          model: "text-davinci-003",
-          prompt: prompt,
-          max_tokens: 1500,
-      });
+    const prompt = `Generate ${numQuestions} multiple-choice questions on the topic: ${topic}`;
+    const response = await openai.completions.create({
+      model: "text-davinci-003",
+      prompt: prompt,
+      max_tokens: 1500,
+    });
 
-      const questions = response.choices[0].text.trim().split('\n');
-      res.json({ questions });
+    const questions = response.choices[0].text.trim().split('\n');
+    res.json({ questions });
   } catch (error) {
-      console.error("Error generating test:", error);
-      res.status(500).json({ error: 'Error generating questions' });
+    console.error("Error generating test :: ", error);
+    res.status(500).json({ error: 'Error generating questions' });
   }
 });
 
