@@ -10,7 +10,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-router.post('/generate-test', async (req, res) => {
+router.post('/ai', async (req, res) => {
   const { topic, numQuestions } = req.body;
 
   try {
