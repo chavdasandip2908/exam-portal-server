@@ -5,7 +5,6 @@ require('dotenv').config();
 
 const Test = require('../model/TestModel');
 
-console.log("key ::  ", process.env.OPENAI_API_KEY);
 // Initialize OpenAI API
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
