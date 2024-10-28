@@ -6,7 +6,9 @@ const Test = require('../model/TestModel');
 
 
 const { HfInference } = require('@huggingface/inference');
-const hf = new HfInference("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");
+const hf = new HfInference(process.env.HUGGING_FACE_API_KEY);
+console.log("api key :: ",process.env.HUGGING_FACE_API_KEY);
+
 
 router.post('/ai', async (req, res) => {
   const { topic } = req.body;
