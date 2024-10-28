@@ -1,33 +1,68 @@
 const express = require('express');
-const OpenAI = require('openai');
 const router = express.Router();
 require('dotenv').config();
 
 const Test = require('../model/TestModel');
 
-// Initialize OpenAI API
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+
+const { HfInference } = require('@huggingface/inference');
+const hf = new HfInference("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");
 
 router.post('/ai', async (req, res) => {
-  const { topic, numQuestions } = req.body;
+  const { topic } = req.body;
+  const prompt = `Generate multiple-choice questions on the topic: ${topic}`;
+
 
   try {
-    const prompt = `Generate ${numQuestions} multiple-choice questions on the topic: ${topic}`;
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 1500,
+    const response = await hf.textGeneration({
+      model: "google/flan-t5-large", // or other models like "EleutherAI/gpt-neo-2.7B"
+      inputs: prompt,
+      parameters: { max_new_tokens: 100, temperature: 0.7 }
     });
+    // Trim and split the response text
+    const questions = response.generated_text.trim().split('\n').filter(q => q); // Filter out empty lines
 
-    const questions = response.choices[0].message.content.trim().split('\n');
-    res.json({ questions });
+    // Check if any questions were generated
+    if (questions.length === 0) {
+      return res.status(400).json({ error: 'No questions generated' });
+    }
+
+    // Transform the questions into the desired format
+    const formattedQuestions = questions.map(q => {
+      // Use regex to match and extract the question, options, and answer
+      const questionMatch = q.match(/Question:\s*(.*?)(?=\s*Options:)/);
+      const optionsMatch = q.match(/Options:\s*(.*?)(?=\s*Answer:)/);
+      const answerMatch = q.match(/Answer:\s*(\w)/); // Matches single letter answer A, B, C, or D
+
+      // If all parts were successfully matched
+      if (questionMatch && optionsMatch && answerMatch) {
+        const questionText = questionMatch[1].trim();
+        const optionsText = optionsMatch[1].trim();
+        const answerText = answerMatch[1].trim();
+
+        // Split options into an array
+        const options = optionsText.split(/(?=\s*[A-D]\s)/).map(option => option.trim());
+
+        return {
+          test: questionText,
+          Options: options,
+          Answer: answerText // Presuming the answer is still labeled A, B, C, or D
+        };
+      } else {
+        console.warn(`Skipping malformed question: ${q}`);
+        return null; // Return null for this question to skip it
+      }
+    }).filter(Boolean); // Filter out null values
+
+    res.json({ questions: formattedQuestions });
   } catch (error) {
     console.error("Error generating test:", error);
     res.status(500).json({ error: 'Error generating questions' });
   }
 });
+
+
+
 
 
 // Create a new test
