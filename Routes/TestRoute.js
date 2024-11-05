@@ -7,7 +7,7 @@ const Test = require('../model/TestModel');
 
 const { HfInference } = require('@huggingface/inference');
 const hf = new HfInference(process.env.HUGGING_FACE_API_KEY);
-console.log("api key :: ",process.env.HUGGING_FACE_API_KEY);
+console.log("api key :: ", process.env.HUGGING_FACE_API_KEY);
 
 
 router.post('/ai', async (req, res) => {
@@ -44,11 +44,13 @@ router.post('/ai', async (req, res) => {
 
         // Split options into an array
         const options = optionsText.split(/(?=\s*[A-D]\s)/).map(option => option.trim());
+        // Convert the answer letter to an index (0 for 'A', 1 for 'B', etc.)
+        const answerIndex = answerText.charCodeAt(0) - 'A'.charCodeAt(0);
 
         return {
           test: questionText,
           Options: options,
-          Answer: answerText // Presuming the answer is still labeled A, B, C, or D
+          Answer: answerIndex // Presuming the answer is still labeled A, B, C, or D
         };
       } else {
         console.warn(`Skipping malformed question: ${q}`);
